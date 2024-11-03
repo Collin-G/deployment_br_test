@@ -4,23 +4,23 @@ import dlib
 import whisper
 import os
 
-from video_handler import VideoHandler
-from audio_handler import AudioHandler
+from data_processor.video_handler import VideoHandler
+from data_processor.audio_handler import AudioHandler
 
 
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor("./data_processor/shape_predictor_68_face_landmarks.dat")
 whisper_model = whisper.load_model("base")
 
 class MainHandler():
     def __init__(self, video):
         self.video = video
-
+        self.temp_video_path = None
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
             temp_video.write(self.video.read())
             temp_video.close()
             temp_audio_path = self.extract_audio_from_video(temp_video.name)
-
+            self.temp_video_path = temp_video.name
         self.temp_audio_path = temp_audio_path
         self.video_handler = VideoHandler(temp_video.name, detector, predictor)
         self.audio_handler = AudioHandler(temp_audio_path)
@@ -32,7 +32,7 @@ class MainHandler():
         audio_features = self.audio_handler.get_mfcc_features()
         text_features  = self.get_speech_to_text(self.temp_audio_path)
         
-        os.unlink(self.video.name)
+        os.unlink(self.temp_video_path)
         os.unlink(self.temp_audio_path)  # Delete the temporary audio file
 
         return {"video" : video_features, "audio": audio_features, "text": text_features}
@@ -44,7 +44,7 @@ class MainHandler():
         return result["text"]
 
 
-    def extract_audio_from_video(video_path):
+    def extract_audio_from_video(self, video_path):
         try:
             temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".wav").name
             (

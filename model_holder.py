@@ -5,7 +5,8 @@ import numpy as np
 import spacy
 
 import gensim.downloader as api
-from transformers import BertTokenizer, BertForMaskedLM, SentenceTransformer
+from transformers import BertTokenizer, BertForMaskedLM
+from sentence_transformers import SentenceTransformer
 
 import model_archs.coherence_model
 import model_archs.linkword_model

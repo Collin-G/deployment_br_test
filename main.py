@@ -70,7 +70,8 @@ def predict():
 
     eye_output = eye_model.predict(data.get("video"))
 
-    star_output = star_model.predict(data.get("text"))
+    # star_output = star_model.predict(data.get("text"))
+    star_output = 0
     coherency_output = coherency_model.predict(data.get("text"))
     linkword_output = linkword_model.predict(data.get("text"))
 
@@ -81,8 +82,8 @@ def predict():
     
     return jsonify({"EngagedTone": float(engage_output), "Calmness" : float(calm_output), \
                     "Eagerness" : float(excited_output), "Friendliness" : float(friendly_output),\
-                        "EyeContact": float(eye_output), "STAR" : star_output, "Coherency": coherency_output, \
-                            "Linkword Usage": linkword_output})
+                        "EyeContact": float(eye_output), "STAR" : float(star_output), "Coherency": float(coherency_output), \
+                            "Linkword Usage": float(linkword_output)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
