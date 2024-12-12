@@ -27,7 +27,7 @@ class CoherenceModel():
             token.text.lower() for token in doc2 
             if token.pos_ in {"NOUN", "VERB", "ADJ", "ADV"} and not token.is_stop
         ]
-        print(relevant_words1, relevant_words2)
+        # print(relevant_words1, relevant_words2)
 
         
         # Get embeddings for relevant words
@@ -46,19 +46,25 @@ class CoherenceModel():
         return coherency_score
 
     def get_coherence(self, paragraph, alpha=0.5):
+        
+      
         total = 0
         for i in range(len(paragraph)-1):
             word_part = 0
             sentence_part = 0
             for k in range(i+1,len(paragraph)):
+
+                # Words between sentences with high simillarity allow for a higher score.
                 word_part+= self.calculate_coherency_score(paragraph[i], paragraph[k])
             
+
+                # Higher semantic difference between sentences allow for high score
                 sbert1 = self.sbert_model.encode(paragraph[i])
                 sbert2 = self.sbert_model.encode(paragraph[k])
                 
                 sentence_part += cosine_similarity(sbert1.reshape(1,-1), sbert2.reshape(1,-1))
                 # print(sentence_part)
-            total += alpha*(word_part/(len(paragraph)-i))+((1-alpha)*(sentence_part/(len(paragraph)-i)))
+            total += alpha*(word_part/(len(paragraph)-i))+(1-(1-alpha)*(sentence_part/(len(paragraph)-i)))
 
         return (total/len(paragraph))
     

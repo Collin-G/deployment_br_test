@@ -24,8 +24,11 @@ LINKING_WORDS_TO_MASK = [
     # Other Linking Words
     "besides", "specifically", "particularly", 
 ]
+ALPHA = 0.5
 
 class LinkwordModel:
+    """Evaluate linking word usage by masking single words and then comparing the cosine simillarity between the prediction of the mask and the actual word
+    """
 
     def __init__(self, w2v_model, bert_model, bert_tokenizer):
         self.w2v_model = w2v_model
@@ -85,13 +88,7 @@ class LinkwordModel:
             if not found_linking_word:
                 predicted_tokens[mask_idx.item()] = "No valid linking word found"
 
-        # Print the prediction for each masked position
-        for idx, token in predicted_tokens.items():
-            print(f"Prediction for masked token at index {idx}: {token}")
-
         predicted_links = (list(predicted_tokens.values()))
-        print(used_links)
-
 
         score = 0
         for i1, i2 in zip(predicted_links, used_links):
@@ -99,8 +96,10 @@ class LinkwordModel:
             embeddings2 = self.w2v_model[i2]
             sim = 1-cosine(embeddings1, embeddings2)
             score += sim
-
-        score = score/len(used_links)
-        return score
+        if len(used_links) == 0:
+            return 0
+        # score = ALPHA*(score/len(used_links)) + (1-ALPHA)(used_links/input_ids)
+        final_score = (score/len(used_links)+len(set(used_links))/len(used_links)+len(used_links)/len(np.array(input_ids)[0]))/4
+        return final_score
 
         

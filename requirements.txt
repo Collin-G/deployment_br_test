@@ -11,9 +11,10 @@ opencv_python==4.8.1.78
 scikit_learn==1.2.2               # Compatible with the updated numpy version
 scipy>=1.9.0,<1.14.0              # Ensure compatibility with numpy
 spacy==3.2.4                      # Works well with numpy and thinc
-torch==1.12.1                     # Compatible with transformers
+# torch==1.12.1                     # Compatible with transformers
 transformers==4.45.2              # Works with torch
 sentence-transformers==3.2.0
-whisper==1.1.10                   # Ensure compatibility with torch
+# whisper==1.1.10                   # Ensure compatibility with torch
+openai-whisper==20230124
 gunicorn==23.0.0
 Werkzeug==2.2.2

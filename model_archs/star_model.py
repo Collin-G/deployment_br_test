@@ -49,6 +49,7 @@ class StarModel():
         doc = self.spacy_model(paragraph)
         # Extract sentences from the spaCy Doc object
         sentences = [sent.text for sent in doc.sents]
+        # print(sentences)
         return sentences
     
     def nn_predict(self, features):
@@ -58,16 +59,13 @@ class StarModel():
             self.neural_net.eval()  # Set the model to evaluation mode
             test_outputs = self.neural_net(test_embeddings)
             predicted_classes = test_outputs.argmax(dim=1).numpy()  # Get predicted class indices
-        
-        return np.array(predicted_classes)
+        # print(predicted_classes)
+        return np.array(test_outputs)
         # Print predictions
 
-    def get_score(self, matrix):
+    def get_score(self,matrix):
         argmax_indices = np.argmax(matrix, axis=1)  # Indices of max elements
         max_values = matrix[np.arange(matrix.shape[0]), argmax_indices]  # Corresponding max values
-
-        # Combine indices and values into an array
-        # result = np.column_stack((argmax_indices, max_values))
 
         no_change = 0
         for i in range(len(argmax_indices)):
@@ -77,11 +75,17 @@ class StarModel():
         
         unique_elements, counts = np.unique(argmax_indices, return_counts=True)
 
+        """reward candidate for:
+
+            - better confidence in each predicted section (for example higher confidence that the sentence belongs in S)
+            - less changes between sections (for example finishes talking about "situation" before moving on to "task" instead of switching back and forth)
+            - including all the sections
+        """
 
         score = (max_values.mean() + no_change/len(argmax_indices) + len(unique_elements)/4)/3
         return score
+  
 
-    
 
 
     

@@ -23,8 +23,6 @@ class VideoHandler():
         video_features = video_features.reshape(video_features.shape[0], video_features.shape[1], -1)
         return video_features
 
-    
-
     def get_total_frames_imageio(self, video_file):
         reader = imageio.get_reader(video_file)
         total_frames = reader.count_frames()
@@ -51,6 +49,7 @@ class VideoHandler():
         return transformed[0]
 
     def scale_landmarks(self, landmarks):
+        # Scale landmarks based on distance from midpoint between eyes
         interocular_dist = np.linalg.norm(landmarks[36] - landmarks[45])
         return landmarks / interocular_dist
 
@@ -65,7 +64,7 @@ class VideoHandler():
             _, centered, _ = procrustes(reference_landmarks, centered)  # Optional Procrustes alignment
         return centered
 
-    # Process video and create batches of 5 (68, 2) landmarks
+    # Process video and create batches of 5 (68, 2) landmarks. Samples 1 frame each second
     def process_video(self, video_path, batch_size=5):
         cap = cv2.VideoCapture(video_path)
         total_frames = self.get_total_frames_imageio(video_path)

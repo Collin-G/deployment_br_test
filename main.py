@@ -15,17 +15,17 @@ from flask_cors import CORS
 
 # Load your model
 
-engage_model = model_holder.ModelHolder("cnn", "./model_states/EngagingTone_model", map_location=torch.device("cpu"))
-calm_model = model_holder.ModelHolder("cnn",  "./model_states/Calm_model", map_location=torch.device("cpu"))
-excited_model = model_holder.ModelHolder("cnn", "./model_states/Excited_model", map_location=torch.device("cpu"))
-friendly_model = model_holder.ModelHolder("cnn", "./model_states/Friendly_model", map_location=torch.device("cpu"))
+engage_model = model_holder.ModelHolder("cnn", "./model_states/Audio_EngagingTone_model", map_location=torch.device("cpu"))
+calm_model = model_holder.ModelHolder("cnn",  "./model_states/Audio_Calmness_model", map_location=torch.device("cpu"))
+excited_model = model_holder.ModelHolder("cnn", "./model_states/Audio_Excited_model", map_location=torch.device("cpu"))
+friendly_model = model_holder.ModelHolder("cnn", "./model_states/Audio_Friendly_model", map_location=torch.device("cpu"))
 
 eye_model = model_holder.ModelHolder("cnn", "./model_states/Videos_EyeContact_model", map_location=torch.device("cpu"))
 
 star_model = model_holder.ModelHolder("star", "./model_states/star_states", map_location=torch.device("cpu"))
 coherency_model = model_holder.ModelHolder("coherency")
 linkword_model = model_holder.ModelHolder("linkword")
-
+filler_model = model_holder.ModelHolder("filler_word")
 
 
 app = Flask(__name__)
@@ -67,23 +67,26 @@ def predict():
     calm_output = calm_model.predict(data.get("audio"))
     excited_output = excited_model.predict(data.get("audio"))
     friendly_output = friendly_model.predict(data.get("audio"))
+   
 
     eye_output = eye_model.predict(data.get("video"))
 
-    # star_output = star_model.predict(data.get("text"))
-    star_output = 0
+    star_output = star_model.predict(data.get("text"))
     coherency_output = coherency_model.predict(data.get("text"))
     linkword_output = linkword_model.predict(data.get("text"))
+    no_filler_output = filler_model.predict(data.get("text"))
 
 
-    print({"EngagedTone": float(engage_output), "Calmness" : float(calm_output), \
-           "Eagerness" : float(excited_output), "Friendliness" : float(friendly_output),\
-            "EyeContact": float(eye_output)})
-    
+    # print({"EngagedTone": float(engage_output), "Calmness" : float(calm_output), \
+    #        "Eagerness" : float(excited_output), "Friendliness" : float(friendly_output),\
+    #         "EyeContact": float(eye_output)})
+
+    total = (engage_output+friendly_output+eye_output+star_output+coherency_output+linkword_output+no_filler_output)/7
+
     return jsonify({"EngagedTone": float(engage_output), "Calmness" : float(calm_output), \
-                    "Eagerness" : float(excited_output), "Friendliness" : float(friendly_output),\
+                    "Eagerness" : float(excited_output), "NoFillers" : float(no_filler_output), "Friendliness" : float(friendly_output),\
                         "EyeContact": float(eye_output), "STAR" : float(star_output), "Coherency": float(coherency_output), \
-                            "Linkword Usage": float(linkword_output)})
+                            "LinkwordUsage": float(linkword_output), "Aggregated" : float(total)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5000)

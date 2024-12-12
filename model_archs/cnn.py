@@ -4,7 +4,6 @@ import torch.nn.functional as F
 import numpy as np
 
 
-
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -22,5 +21,5 @@ class CNN(nn.Module):
         x = self.avg_pool(x)  # Output: (batch_size, 64, 1, 1)
         x = x.view(-1, 64)  # Flatten the tensor
         x = self.leaky_relu(self.fc1(x))  # Use Leaky ReLU for the first fully connected layer
-        x = torch.sigmoid(self.fc2(x))  # Sigmoid activation for binary output
+        x = self.fc2(x) # No sigmoid since we are using BCE with logits
         return x

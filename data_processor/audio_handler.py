@@ -7,9 +7,6 @@ class AudioHandler():
     def __init__(self, file):
         self.file = file
 
-
-
-
     def normalize_mfcc_batches(self, mfcc_batches):
         """
         Normalize MFCC batches using mean-variance normalization.
